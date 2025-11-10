@@ -1,0 +1,62 @@
+{
+  "words": [
+    {
+      "answer": "SONRISA",
+      "hint": "Gesto que alegra mi alma.",
+      "note": "Esa sonrisa que me derrite",
+      "photo": "./Subir/sonrisa.webp"
+    },
+    {
+      "answer": "AMOR",
+      "hint": "Sentimiento que nos une / La base de nuestra relación.",
+      "note": "Siempre NOSOTROS",
+      "photo": "./Subir/amor.jpg"
+    },
+    {
+      "answer": "SEÑOR",
+      "hint": "Primer fin de semana juntos, en Capilla del ......",
+      "note": "Primera salidita de tantas",
+      "photo": "./Subir/señor.jpg"
+    },
+    {
+      "answer": "BESO",
+      "hint": "Voy a hacer algo distinto me dijiste, y me diste el primero",
+      "note": "Ese ‘algo distinto’ fue el beso que cambió todo.",
+      "photo": "./Subir/beso.webp"
+    },
+    {
+      "answer": "TOMADA",
+      "hint": "La primer salida fue en Casa ......",
+      "note": "En Casa Tomada empezó lo nuestro, único y hermoso.",
+      "photo": "./Subir/Casa.png"
+    },
+    {
+      "answer": "FRANC",
+      "hint": "Nuestro varietal preferido es Cabernet .....",
+      "note": "Brindis con Cabernet Franc y miradas que dicen todo",
+      "photo": "./Subir/Franc.png"
+    },
+    {
+      "answer": "ES POR A CÁ",
+      "hint": "Por dónde es?",
+      "note": "Con vos siempre es por acá: juntos a cualquier lado.",
+      "photo": "./Subir/por aca.png"
+    },
+    {
+      "answer": "PASIÓN",
+      "hint": "Fuego que nos hace sentir más vivos el uno por el otro",
+      "note": "Nuestra pasión: fuego dulce que siempre nos encuentra.",
+      "photo": "./Subir/pasion.webp"
+    }
+  ],
+  "syllables": [
+    ["SON", "RI", "SA"],
+    ["A", "MOR"],
+    ["SE", "ÑOR"],
+    ["BE", "SO"],
+    ["TO", "MA", "DA"],
+    ["FRANC"],
+    ["ES", "POR", "A", "CÁ"],
+    ["PA", "SIÓN"]
+  ]
+}

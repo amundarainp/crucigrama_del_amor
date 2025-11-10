@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Crucigrama del amor 💖</title>
+    <meta
+      name="description"
+      content="Página romántica con crucigrama acróstico NOSOTROS, sílabas y foto fija."
+    />
+    <meta property="og:title" content="Crucigrama del amor 💖" />
+    <meta
+      property="og:description"
+      content="Un juego tierno para celebrar nuestro aniversario."
+    />
+    <meta name="theme-color" content="#e11d48" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50%' x='50%' dominant-baseline='middle' text-anchor='middle' font-size='52'%3E%F0%9F%92%96%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="container header">
+      <h1>Crucigrama del amor</h1>
+      <p class="tagline">
+        Un juego tierno para celebrar nuestro aniversario 💘
+      </p>
+      <div
+        style="margin-top: 10px; display: flex; gap: 10px; align-items: center"
+      >
+        <button
+          id="themeToggle"
+          type="button"
+          class="theme-btn"
+          aria-pressed="false"
+          aria-label="Cambiar tema"
+        >
+          <span class="theme-icon" aria-hidden="true">🌙</span>
+          <span class="theme-text">Modo oscuro</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="photo-section" aria-labelledby="photoTitle">
+        <h2 id="photoTitle" class="sr-only">Nuestra foto</h2>
+        <div class="photo-card">
+          <div class="photo-frame">
+            <img
+              id="couplePhoto"
+              alt="Nuestra foto juntos"
+              src="./Subir/Portada.avif"
+            />
+          </div>
+          <p class="photo-legend">
+            <span aria-hidden="true">❝</span>
+            Primer salida juntos. Finde hermoso
+            <span aria-hidden="true">❞</span>
+          </p>
+        </div>
+      </section>
+
+      <section id="intro" aria-labelledby="intro-title">
+        <h2 id="intro-title">Instructivo</h2>
+        <p>
+          Completá las palabras y, cuando termines, tocá
+          <strong>Verificar</strong>. Todo tiene que ver con <em>nosotros</em>.
+          Al final, el acróstico vertical dice <strong>NOSOTROS</strong>.
+        </p>
+        <div id="status" class="status" aria-live="polite"></div>
+      </section>
+
+      <section class="grid-wrap" aria-label="Crucigrama y pistas">
+        <!-- Sílabas + Toggle + Botones -->
+        <aside class="syllables" aria-labelledby="syllTitle">
+          <div class="syllables-header">
+            <h2 id="syllTitle">Sílabas</h2>
+            <label class="toggle" title="Cambiar tamaño de celdas">
+              <input
+                type="checkbox"
+                id="sizeToggle"
+                class="switch-input"
+                aria-label="Modo compacto"
+                aria-controls="crosswordGrid"
+              />
+              <span class="switch" aria-hidden="true"></span>
+              <span class="label">Modo compacto</span>
+            </label>
+          </div>
+          <div id="syllGrid" class="syll-grid" role="list"></div>
+          <p class="syll-hint">
+            Tip: clic en una sílaba la inserta desde la celda enfocada →
+          </p>
+          <div class="controls" role="group" aria-label="Acciones rápidas">
+            <button id="checkBtn">Verificar</button>
+            <button id="clearBtn" class="secondary">Borrar</button>
+            <button
+              id="revealBtn"
+              class="secondary"
+              title="Revelar la próxima letra de la palabra activa"
+            >
+              Revelar letra
+            </button>
+            <button
+              id="qrBtn"
+              class="secondary"
+              title="Mostrar código QR del sitio"
+            >
+              QR del sitio
+            </button>
+          </div>
+        </aside>
+
+        <!-- Tablero -->
+        <div>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 16px;
+            "
+          >
+            <h2 id="gridTitle" style="margin: 0">Grilla del crucigrama</h2>
+            <div class="grid-style" aria-label="Estilo de grilla">
+              <label for="gridStyle">Estilo:</label>
+              <select id="gridStyle" aria-controls="crosswordGrid">
+                <option value="contrast">Contraste alto</option>
+                <option value="clarin">
+                  Modo Claringrilla (oculta vacías)
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="board" aria-labelledby="gridTitle">
+            <div class="corner" aria-hidden="true"></div>
+            <div id="colIndex" class="col-index" role="presentation"></div>
+            <div id="rowIndex" class="row-index" role="presentation"></div>
+            <div
+              id="crosswordGrid"
+              role="grid"
+              aria-labelledby="gridTitle"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Pistas -->
+        <aside class="clues" aria-labelledby="cluesTitle">
+          <h2 id="cluesTitle">Pistas</h2>
+          <h3>Horizontales</h3>
+          <ol id="acrossList"></ol>
+        </aside>
+      </section>
+
+      <footer role="contentinfo">Hecho con ♥</footer>
+    </main>
+
+    <!-- Modal final (Share Card) -->
+    <div
+      id="finalModal"
+      class="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="finalTitle"
+    >
+      <div class="modal">
+        <h3 id="finalTitle">¡Felicidades, amor!</h3>
+        <p id="finalMsg">
+          Completamos nuestro crucigrama del amor. Siempre
+          <strong>NOSOTROS</strong> 💗
+        </p>
+        <div class="share-card-wrap">
+          <canvas
+            id="shareCanvas"
+            width="1000"
+            height="700"
+            aria-label="Tarjeta para compartir"
+          ></canvas>
+        </div>
+        <div class="controls" style="justify-content: center">
+          <button id="downloadCard" class="secondary">Descargar tarjeta</button>
+          <button id="shareCard">Compartir</button>
+          <button id="closeModal" class="secondary">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal QR -->
+    <div
+      id="qrModal"
+      class="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="qrTitle"
+    >
+      <div class="modal">
+        <h3 id="qrTitle">Abrí este juego desde tu celular</h3>
+        <p style="margin-bottom: 10px">Escaneá el QR o compartí el link</p>
+        <div></div>
+        <div
+          id="qrContainer"
+          style="display: grid; place-items: center; margin: 10px 0 8px"
+        ></div>
+        <div></div>
+        <div class="controls" style="justify-content: center">
+          <button id="copyUrl" class="secondary">Copiar URL</button>
+          <button id="shareQr" class="secondary">Compartir QR</button>
+          <button id="downloadQr" class="secondary">Descargar QR</button>
+          <button id="closeQr" class="secondary">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sonidos -->
+    <audio id="sndType" src="assets/snd-type.mp3" preload="auto"></audio>
+    <audio id="sndClick" src="assets/snd-click.mp3" preload="auto"></audio>
+    <audio id="sndSuccess" src="assets/snd-success.mp3" preload="auto"></audio>
+
+    <!-- Toasts -->
+    <div
+      id="toastHost"
+      class="toast-host"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+    <div id="toastOverlay" aria-hidden="true"></div>
+
+    <script src="vendor/qrcode.min.js" defer></script>
+    <script src="index.js" defer></script>
+  </body>
+</html>
