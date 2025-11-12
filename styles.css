@@ -83,12 +83,38 @@ html[data-theme="dark"] body {
   margin: 0 auto;
   padding: calc(var(--space) * 1.2);
 }
+/* ==================== Sticky Header ==================== */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--surface-veil);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  animation: slideDown 0.3s var(--ease-out);
+}
+html[data-theme="dark"] .sticky-header {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.main-spacer {
+  height: calc(var(--space) * 0.8);
+}
 .header {
   backdrop-filter: blur(6px);
-  background: var(--surface-veil);
-  border-radius: var(--radius);
+  background: transparent;
+  border-radius: 0;
   padding: calc(var(--space) * 1.2);
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 h1 {
   font-size: var(--fs-title);
@@ -787,14 +813,60 @@ input[type="checkbox"].switch-input {
 }
 /* ==================== Footer ==================== */
 footer {
-  color: var(--text);
   text-align: center;
   margin-top: var(--space);
-  font-weight: 700;
-  background: var(--surface-veil);
-  padding: 10px 12px;
-  border-radius: 10px;
   box-shadow: var(--shadow);
+}
+footer a {
+  transition: opacity 0.2s ease;
+}
+footer a:hover {
+  opacity: 0.8;
+}
+footer small {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+footer p {
+  margin: 0;
+}
+/* ==================== Botón flotante Amor en Páginas ==================== */
+.amor-badge {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1050;
+  background: #ffffff;
+  color: #2d2d2d;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  font: 600 13px/1.2 -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  transition: all 0.2s ease;
+}
+.amor-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background: #f9f9f9;
+}
+.amor-badge svg {
+  flex-shrink: 0;
+  color: #e11d48;
+}
+html[data-theme="dark"] .amor-badge {
+  background: #1a1f2b;
+  color: #e8e6ee;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+html[data-theme="dark"] .amor-badge:hover {
+  background: #1e2331;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
 }
 @media (min-width: 1280px) {
   :root:not(.compact) {
