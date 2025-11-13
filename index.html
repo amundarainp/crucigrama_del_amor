@@ -54,6 +54,17 @@
         <span aria-hidden="true">🎥</span>
         <span>Recorrido</span>
       </button>
+      <button
+        id="startNarratedDemoBtn"
+        type="button"
+        class="theme-btn"
+        aria-label="Iniciar demo narrada"
+        title="Iniciar demo"
+        style="display:none"
+      >
+        <span aria-hidden="true">▶</span>
+        <span>Iniciar demo</span>
+      </button>
     </div>
 
     <main class="container">
@@ -336,6 +347,34 @@
             btn.style.opacity = "";
           }
         });
+
+        // Botón para iniciar la demo narrada (solo si ?demo=1)
+        const startBtn = document.getElementById("startNarratedDemoBtn");
+        const params = new URLSearchParams(window.location.search);
+        const isDemo = params.has("demo");
+        if (startBtn) {
+          if (isDemo) startBtn.style.display = "inline-flex";
+          startBtn.addEventListener("click", async () => {
+            startBtn.disabled = true;
+            startBtn.style.opacity = "0.7";
+            try {
+              await loadDemoScript();
+              if (window.DEMO && typeof window.DEMO.runNarratedDemo === "function") {
+                await window.DEMO.runNarratedDemo();
+              } else if (typeof window.runNarratedDemo === "function") {
+                await window.runNarratedDemo();
+              } else {
+                alert("La demo narrada no está disponible.");
+              }
+            } catch (err) {
+              console.error(err);
+              alert("Error cargando la demo narrada.");
+            } finally {
+              startBtn.disabled = false;
+              startBtn.style.opacity = "";
+            }
+          });
+        }
       })();
     </script>
   </body>

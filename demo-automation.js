@@ -129,15 +129,15 @@
   // ============================================
   let guideRefs = null;
   const DEMO_TEXT = {
-    intro_theme: "Arranquemos cambiando el tema entre claro y oscuro.",
-    foto: "Acá va una foto, o hasta cuatro, que elijan.",
-    instructivo: "En el instructivo explicamos cómo jugar y que el acrónimo final se adapta a la palabra que elijan.",
+    intro_theme: "Empecemos cambiando el tema: claro u oscuro, como te guste.",
+    foto: "Acá va su foto favorita… o hasta cuatro, elegidas por ustedes.",
+    instructivo: "Así se juega: completás palabras y al final el acrónimo se adapta a lo que elijan.",
     clue_sonrisa: "Leemos la pista y completamos la respuesta: sonrisa.",
-    syllables: "Las sílabas usadas se tachan automáticamente al insertarlas.",
-    toast_card: "Al acertar, aparece una tarjeta de recuerdo: se puede ampliar y descargar.",
-    reveal: "Si te trabás, podés revelar una letra de la palabra activa.",
-    verify: "Con el crucigrama completo, tocamos Verificar y vemos la tarjeta final.",
-    qr: "Podés mostrar y descargar el código QR para compartir fácilmente.",
+    syllables: "Cada sílaba que usás se tacha sola. Simple y ordenado.",
+    toast_card: "Cuando aciertas, aparece una tarjetita de recuerdo. Podés ampliarla y descargarla.",
+    reveal: "¿Te trabaste? Revelá una letra para seguir sin perder el encanto.",
+    verify: "Con todo completo, tocamos Verificar y vemos la tarjeta final.",
+    qr: "Y si querés compartir, mostramos y descargamos el código QR.",
   };
 
   function ensureGuideStyles() {
@@ -743,6 +743,19 @@
       demoRunning = false;
     }
   }
+
+  // Variante de 60s: ajusta velocidad y duración temporalmente
+  async function runNarratedDemo60() {
+    const prev = { speed: DEMO_CONFIG.speed, msgDuration: DEMO_CONFIG.msgDuration };
+    DEMO_CONFIG.speed = 0.65;
+    DEMO_CONFIG.msgDuration = 1600;
+    try {
+      await runNarratedDemo();
+    } finally {
+      DEMO_CONFIG.speed = prev.speed;
+      DEMO_CONFIG.msgDuration = prev.msgDuration;
+    }
+  }
   async function runGuidedDemo() {
     if (demoRunning) {
       console.log("⚠️  Ya hay una demo en ejecución");
@@ -1009,6 +1022,7 @@
   console.log("📋 COMANDOS DISPONIBLES:");
   console.log("");
   console.log("  runNarratedDemo()      - Demo narrada (recomendada para grabar)");
+  console.log("  runNarratedDemo60()    - Demo narrada versión 60s");
   console.log("  runFullDemo()          - Demo completa (2-3 minutos)");
   console.log("  runQuickDemo()         - Demo rápida (60 segundos)");
   console.log("  runDemoStep(n)         - Ejecutar solo el paso n (1-14)");
@@ -1048,6 +1062,7 @@
     runQuickDemo,
     runDemoStep,
     runNarratedDemo,
+    runNarratedDemo60,
     runGuidedDemo,
     runGuidedStep,
     pauseDemo,
