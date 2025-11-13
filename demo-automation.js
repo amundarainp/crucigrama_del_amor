@@ -79,10 +79,64 @@
   };
 
   // ============================================
-  // UI DE GUÍA INTERACTIVA
+  // PUNTERO ANIMADO (cursor visual)
   // ============================================
-  let guideDisabled = false;
+  let pointerEl = null;
+  function ensurePointerStyles() {
+    if (document.getElementById("demoPointerStyles")) return;
+    const style = document.createElement("style");
+    style.id = "demoPointerStyles";
+    style.textContent = `
+      .demo-pointer{position:fixed;left:0;top:0;width:22px;height:22px;pointer-events:none;z-index:99999;
+        transform:translate(-100px,-100px);transition:transform 460ms cubic-bezier(0.2,0.7,0.2,1)}
+      .demo-pointer::before{content:"";position:absolute;left:0;top:0;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:18px solid #111;border-top:0;
+        filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
+      html[data-theme="dark"] .demo-pointer::before{border-bottom-color:#eee}
+    `;
+    document.head.appendChild(style);
+  }
+  function ensurePointer() {
+    ensurePointerStyles();
+    if (!pointerEl) {
+      pointerEl = document.createElement("div");
+      pointerEl.className = "demo-pointer";
+      document.body.appendChild(pointerEl);
+    }
+    return pointerEl;
+  }
+  async function movePointerTo(target, offsetX = 0, offsetY = -10) {
+    const el = typeof target === "string" ? qs(target) : target;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = rect.left + rect.width / 2 + offsetX;
+    const y = rect.top + rect.height / 2 + offsetY;
+    ensurePointer();
+    pointerEl.style.transform = `translate(${x}px, ${y}px)`;
+    await wait(500);
+  }
+  async function clickWithPointer(target) {
+    const el = typeof target === "string" ? qs(target) : target;
+    if (!el) return;
+    await movePointerTo(el);
+    el.click();
+    await wait(500);
+  }
+
+  // ============================================
+  // UI DE MENSAJES (autoavance, sin confirmación)
+  // ============================================
   let guideRefs = null;
+  const DEMO_TEXT = {
+    intro_theme: "Arranquemos cambiando el tema entre claro y oscuro.",
+    foto: "Acá va una foto, o hasta cuatro, que elijan.",
+    instructivo: "En el instructivo explicamos cómo jugar y que el acrónimo final se adapta a la palabra que elijan.",
+    clue_sonrisa: "Leemos la pista y completamos la respuesta: sonrisa.",
+    syllables: "Las sílabas usadas se tachan automáticamente al insertarlas.",
+    toast_card: "Al acertar, aparece una tarjeta de recuerdo: se puede ampliar y descargar.",
+    reveal: "Si te trabás, podés revelar una letra de la palabra activa.",
+    verify: "Con el crucigrama completo, tocamos Verificar y vemos la tarjeta final.",
+    qr: "Podés mostrar y descargar el código QR para compartir fácilmente.",
+  };
 
   function ensureGuideStyles() {
     if (document.getElementById("demoGuideStyles")) return;
@@ -95,10 +149,8 @@
       .demo-guide-card{position:relative;max-width:640px;width:calc(100% - 32px);margin:16px;background:var(--bg,#fff);color:var(--fg,#222);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:20px;z-index:1}
       .demo-guide-card h3{margin:0 0 8px 0;font-size:18px}
       .demo-guide-msg{font-size:15px;line-height:1.5;margin:0 0 16px 0}
-      .demo-guide-actions{display:flex;gap:8px;justify-content:flex-end}
-      .demo-guide-btn{appearance:none;border:0;border-radius:8px;padding:10px 14px;cursor:pointer;font-weight:600}
-      .demo-guide-btn.primary{background:#ffd54f;color:#222}
-      .demo-guide-btn.secondary{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6)}
+      .demo-guide-actions{display:none}
+      .demo-guide-btn{display:none}
       .demo-guide-highlight{outline:3px solid #ffd700 !important;outline-offset:4px !important;transition:outline-color .25s ease}
       @media (prefers-color-scheme: dark){
         .demo-guide-card{--bg:#111;--fg:#eee;border:1px solid #222}
@@ -125,14 +177,6 @@
     msg.className = "demo-guide-msg";
     const actions = document.createElement("div");
     actions.className = "demo-guide-actions";
-    const btnSkip = document.createElement("button");
-    btnSkip.className = "demo-guide-btn secondary";
-    btnSkip.textContent = "Salir de la guía";
-    const btnNext = document.createElement("button");
-    btnNext.className = "demo-guide-btn primary";
-    btnNext.textContent = "Continuar";
-    actions.appendChild(btnSkip);
-    actions.appendChild(btnNext);
     card.appendChild(title);
     card.appendChild(msg);
     card.appendChild(actions);
@@ -140,7 +184,7 @@
     overlay.appendChild(card);
     document.body.appendChild(overlay);
 
-    guideRefs = { overlay, msg, btnNext, btnSkip };
+    guideRefs = { overlay, msg };
     return guideRefs;
   }
 
@@ -155,47 +199,41 @@
     guideRefs.overlay.classList.remove("active");
   }
 
-  async function guideStep(message, options = {}) {
-    if (guideDisabled) return; // Saltado por el usuario
-    const { target, offset = -120 } = options;
-
-    // Preparar y mostrar overlay
+  async function showMessage(message, options = {}) {
+    const { target, offset = -120, duration = 2200 } = options;
     ensureGuideUI();
 
-    // Resaltar objetivo si existe
     let el = null;
     if (target) {
       el = typeof target === "string" ? qs(target) : target;
       if (el) {
         const y = el.getBoundingClientRect().top + window.pageYOffset + offset;
         window.scrollTo({ top: y, behavior: "smooth" });
-        await wait(600);
+        await wait(500);
         el.classList.add("demo-guide-highlight");
       }
     }
 
     showOverlay(message);
-
-    // Esperar interacción
-    await new Promise((resolve) => {
-      const onNext = () => {
-        guideRefs.btnNext.removeEventListener("click", onNext);
-        guideRefs.btnSkip.removeEventListener("click", onSkip);
-        resolve();
-      };
-      const onSkip = () => {
-        guideDisabled = true;
-        guideRefs.btnNext.removeEventListener("click", onNext);
-        guideRefs.btnSkip.removeEventListener("click", onSkip);
-        resolve();
-      };
-      guideRefs.btnNext.addEventListener("click", onNext);
-      guideRefs.btnSkip.addEventListener("click", onSkip);
-    });
-
+    await wait(duration);
     hideOverlay();
     if (el) el.classList.remove("demo-guide-highlight");
     await wait(150);
+  }
+
+  // ============================================
+  // CONTROL HEADER STICKY DURANTE DEMO
+  // ============================================
+  let headerEl = null;
+  let headerHadSticky = false;
+  function disableStickyHeader() {
+    headerEl = qs("header");
+    if (!headerEl) return;
+    headerHadSticky = headerEl.classList.contains("sticky-header");
+    if (headerHadSticky) headerEl.classList.remove("sticky-header");
+  }
+  function restoreStickyHeader() {
+    if (headerEl && headerHadSticky) headerEl.classList.add("sticky-header");
   }
 
   // Control de pausa
@@ -591,6 +629,118 @@
   // FUNCIONES PRINCIPALES
   // ============================================
 
+  async function runNarratedDemo() {
+    if (demoRunning) {
+      console.log("⚠️  Ya hay una demo en ejecución");
+      return;
+    }
+    demoRunning = true;
+    demoPaused = false;
+
+    try {
+      // 1) Tema: mostrar toggle con cursor y ejecutar cambios
+      disableStickyHeader();
+      await showMessage(DEMO_TEXT.intro_theme, { target: "#themeToggle", duration: 2400 });
+      await movePointerTo("#themeToggle");
+      await clickWithPointer("#themeToggle"); // oscuro
+      await wait(900);
+      await clickWithPointer("#themeToggle"); // claro
+
+      // 2) Foto
+      await showMessage(DEMO_TEXT.foto, { target: ".photo-section" });
+
+      // 3) Instructivo
+      await showMessage(DEMO_TEXT.instructivo, { target: "#intro" });
+
+      // 4) Crucigrama: pista + completar SONRISA
+      scrollTo("#crosswordGrid");
+      await wait(600);
+      await showMessage(DEMO_TEXT.clue_sonrisa, { target: "#clues" });
+      const firstClue = qs("#clue-across-0");
+      if (firstClue) {
+        highlightElement(firstClue, 1400);
+        await wait(700);
+      }
+      clickCell(0, 8);
+      await wait(500);
+      await showMessage(DEMO_TEXT.syllables, { target: "#syllGrid", duration: 1800 });
+      clickSyllable("SON");
+      await wait(400);
+      clickSyllable("RI");
+      await wait(400);
+      clickSyllable("SA");
+      await wait(600);
+
+      // Mostrar tarjeta personalizada (toast): ampliar y descargar
+      await wait(800);
+      await showMessage(DEMO_TEXT.toast_card, { target: ".toast-host", duration: 2200 });
+      const toast = qs(".toast");
+      if (toast) {
+        const expandBtn = toast.querySelector("button.secondary");
+        if (expandBtn && expandBtn.textContent === "Ampliar") {
+          click(expandBtn);
+          await wait(1400);
+          // Descargar imagen de recuerdo si existe acción
+          const downloadBtn = Array.from(toast.querySelectorAll("button")).find(b => /Descargar|Guardar/i.test(b.textContent));
+          if (downloadBtn) {
+            click(downloadBtn);
+            await wait(800);
+          }
+          // Cerrar toast
+          const closeBtn = toast.querySelector(".close-x");
+          if (closeBtn) {
+            click(closeBtn);
+            await wait(400);
+          }
+        }
+      }
+
+      // 5) Funciones debajo de sílabas: Revelar letra
+      await showMessage(DEMO_TEXT.reveal, { target: "#revealBtn" });
+      click("#revealBtn");
+      await wait(1000);
+
+      // Completar todo el crucigrama rápidamente
+      clickCell(1, 8); clickSyllable("A"); await wait(250); clickSyllable("MOR");
+      clickCell(2, 8); await wait(250); clickSyllable("SE"); await wait(250); clickSyllable("ÑOR");
+      clickCell(3, 8); await wait(250); clickSyllable("BE"); await wait(250); clickSyllable("SO");
+      clickCell(4, 9); await wait(250); clickSyllable("TO"); await wait(250); clickSyllable("MA"); await wait(250); clickSyllable("DA");
+      clickCell(5, 8); await wait(250); clickSyllable("FRANC");
+      clickCell(6, 8); await wait(250); clickSyllable("ES"); await wait(200); clickSyllable("POR"); await wait(200); clickSyllable("A"); await wait(200); clickSyllable("CÁ");
+      clickCell(7, 8); await wait(250); clickSyllable("PA"); await wait(200); clickSyllable("SIÓN");
+      await wait(600);
+
+      // 6) Verificar y modal final
+      await showMessage(DEMO_TEXT.verify, { target: "#checkBtn" });
+      click("#checkBtn");
+      await wait(1800);
+      const modal = qs("#finalModal");
+      if (modal) {
+        highlightElement("#shareCanvas", 1400);
+        await wait(1600);
+        // Descargar tarjeta final
+        click("#downloadCard");
+        await wait(800);
+        click("#closeModal");
+        await wait(800);
+      }
+
+      // 7) QR: mostrar y descargar
+      await showMessage(DEMO_TEXT.qr, { target: "#qrBtn" });
+      click("#qrBtn");
+      await wait(1200);
+      click("#downloadQr");
+      await wait(800);
+      click("#closeQr");
+
+      console.log("✅ Demo narrada completada.");
+    } catch (err) {
+      console.error("❌ Error en demo narrada:", err);
+    } finally {
+      restoreStickyHeader();
+      demoRunning = false;
+    }
+  }
   async function runGuidedDemo() {
     if (demoRunning) {
       console.log("⚠️  Ya hay una demo en ejecución");
@@ -859,6 +1009,7 @@
   console.log("  runFullDemo()          - Demo completa (2-3 minutos)");
   console.log("  runQuickDemo()         - Demo rápida (60 segundos)");
   console.log("  runDemoStep(n)         - Ejecutar solo el paso n (1-14)");
+  console.log("  runNarratedDemo()      - Demo narrada (auto, sin confirmar)");
   console.log("  runGuidedDemo()        - Demo guiada (avanza con clic)");
   console.log("  runGuidedStep(n)       - Paso n con guía (1-14)");
   console.log("  pauseDemo()            - Pausar la demo");
@@ -894,6 +1045,7 @@
     runFullDemo,
     runQuickDemo,
     runDemoStep,
+    runNarratedDemo,
     runGuidedDemo,
     runGuidedStep,
     pauseDemo,
@@ -903,6 +1055,7 @@
   window.runFullDemo = runFullDemo;
   window.runQuickDemo = runQuickDemo;
   window.runDemoStep = runDemoStep;
+  window.runNarratedDemo = runNarratedDemo;
   window.runGuidedDemo = runGuidedDemo;
   window.runGuidedStep = runGuidedStep;
   window.pauseDemo = pauseDemo;
