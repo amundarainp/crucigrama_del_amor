@@ -31,20 +31,20 @@
     </header>
 
     <div class="main-spacer"></div>
-      <div
-        style="margin-top: 10px; display: flex; gap: 10px; align-items: center"
+    <div
+      style="margin-top: 10px; display: flex; gap: 10px; align-items: center"
+    >
+      <button
+        id="themeToggle"
+        type="button"
+        class="theme-btn"
+        aria-pressed="false"
+        aria-label="Cambiar tema"
       >
-        <button
-          id="themeToggle"
-          type="button"
-          class="theme-btn"
-          aria-pressed="false"
-          aria-label="Cambiar tema"
-        >
-          <span class="theme-icon" aria-hidden="true">🌙</span>
-          <span class="theme-text">Modo oscuro</span>
-        </button>
-      </div>
+        <span class="theme-icon" aria-hidden="true">🌙</span>
+        <span class="theme-text">Modo oscuro</span>
+      </button>
+    </div>
 
     <main class="container">
       <section class="photo-section" aria-labelledby="photoTitle">
@@ -157,10 +157,39 @@
         </aside>
       </section>
 
-      <footer role="contentinfo" style="background: var(--accent); color: white; padding: 1.5rem 0; margin-top: 2rem; border-radius: 10px;">
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">
-          <p style="margin-bottom: 0.5rem;"><small>Creado con ❤️ por <a href="https://amor-en-paginas.pages.dev/" style="color: #ffd700; font-weight: 700;">Amor en Páginas</a> — <a href="https://amor-en-paginas.pages.dev/#paquetes" style="color: #ffd700; text-decoration: underline;">Paquete Premium</a></small></p>
-          <p style="margin-bottom: 0; opacity: 0.8;"><small>Entrega estimada: 10 días | Soporte extendido y actualizaciones incluidas</small></p>
+      <footer
+        role="contentinfo"
+        style="
+          background: var(--accent);
+          color: white;
+          padding: 1.5rem 0;
+          margin-top: 2rem;
+          border-radius: 10px;
+        "
+      >
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem">
+          <p style="margin-bottom: 0.5rem">
+            <small
+              >Creado con ❤️ por
+              <a
+                href="https://amor-en-paginas.pages.dev/"
+                style="color: #ffd700; font-weight: 700"
+                >Amor en Páginas</a
+              >
+              —
+              <a
+                href="https://amor-en-paginas.pages.dev/#paquetes"
+                style="color: #ffd700; text-decoration: underline"
+                >Paquete Premium</a
+              ></small
+            >
+          </p>
+          <p style="margin-bottom: 0; opacity: 0.8">
+            <small
+              >Entrega estimada: 10 días | Soporte extendido y actualizaciones
+              incluidas</small
+            >
+          </p>
         </div>
       </footer>
     </main>
@@ -236,9 +265,24 @@
     <div id="toastOverlay" aria-hidden="true"></div>
 
     <!-- Botón flotante Amor en Páginas -->
-    <a href="https://amor-en-paginas.pages.dev/" class="amor-badge" aria-label="Amor en Páginas" target="_blank" rel="noopener">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
+    <a
+      href="https://amor-en-paginas.pages.dev/"
+      class="amor-badge"
+      aria-label="Amor en Páginas"
+      target="_blank"
+      rel="noopener"
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+          fill="currentColor"
+        />
       </svg>
       <span>Amor en Páginas</span>
     </a>
