@@ -29,6 +29,8 @@
   // Utilidades
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const qs = (selector) => document.querySelector(selector);
+  const DEMO_CONFIG = { speed: 1, msgDuration: 2400 };
+  const waitScaled = (ms) => wait(ms * DEMO_CONFIG.speed);
   const click = (selector) => {
     const el = typeof selector === "string" ? qs(selector) : selector;
     if (el) {
@@ -112,14 +114,14 @@
     const y = rect.top + rect.height / 2 + offsetY;
     ensurePointer();
     pointerEl.style.transform = `translate(${x}px, ${y}px)`;
-    await wait(500);
+    await waitScaled(500);
   }
   async function clickWithPointer(target) {
     const el = typeof target === "string" ? qs(target) : target;
     if (!el) return;
     await movePointerTo(el);
     el.click();
-    await wait(500);
+    await waitScaled(500);
   }
 
   // ============================================
@@ -200,7 +202,7 @@
   }
 
   async function showMessage(message, options = {}) {
-    const { target, offset = -120, duration = 2200 } = options;
+    const { target, offset = -120, duration = DEMO_CONFIG.msgDuration } = options;
     ensureGuideUI();
 
     let el = null;
@@ -209,16 +211,16 @@
       if (el) {
         const y = el.getBoundingClientRect().top + window.pageYOffset + offset;
         window.scrollTo({ top: y, behavior: "smooth" });
-        await wait(500);
+        await waitScaled(500);
         el.classList.add("demo-guide-highlight");
       }
     }
 
     showOverlay(message);
-    await wait(duration);
+    await waitScaled(duration);
     hideOverlay();
     if (el) el.classList.remove("demo-guide-highlight");
-    await wait(150);
+    await waitScaled(150);
   }
 
   // ============================================
@@ -640,10 +642,10 @@
     try {
       // 1) Tema: mostrar toggle con cursor y ejecutar cambios
       disableStickyHeader();
-      await showMessage(DEMO_TEXT.intro_theme, { target: "#themeToggle", duration: 2400 });
+      await showMessage(DEMO_TEXT.intro_theme, { target: "#themeToggle" });
       await movePointerTo("#themeToggle");
       await clickWithPointer("#themeToggle"); // oscuro
-      await wait(900);
+      await waitScaled(900);
       await clickWithPointer("#themeToggle"); // claro
 
       // 2) Foto
@@ -654,43 +656,43 @@
 
       // 4) Crucigrama: pista + completar SONRISA
       scrollTo("#crosswordGrid");
-      await wait(600);
+      await waitScaled(600);
       await showMessage(DEMO_TEXT.clue_sonrisa, { target: "#clues" });
       const firstClue = qs("#clue-across-0");
       if (firstClue) {
         highlightElement(firstClue, 1400);
-        await wait(700);
+        await waitScaled(700);
       }
       clickCell(0, 8);
-      await wait(500);
-      await showMessage(DEMO_TEXT.syllables, { target: "#syllGrid", duration: 1800 });
+      await waitScaled(500);
+      await showMessage(DEMO_TEXT.syllables, { target: "#syllGrid", duration: DEMO_CONFIG.msgDuration - 600 });
       clickSyllable("SON");
-      await wait(400);
+      await waitScaled(400);
       clickSyllable("RI");
-      await wait(400);
+      await waitScaled(400);
       clickSyllable("SA");
-      await wait(600);
+      await waitScaled(600);
 
       // Mostrar tarjeta personalizada (toast): ampliar y descargar
-      await wait(800);
-      await showMessage(DEMO_TEXT.toast_card, { target: ".toast-host", duration: 2200 });
+      await waitScaled(800);
+      await showMessage(DEMO_TEXT.toast_card, { target: ".toast-host" });
       const toast = qs(".toast");
       if (toast) {
         const expandBtn = toast.querySelector("button.secondary");
         if (expandBtn && expandBtn.textContent === "Ampliar") {
           click(expandBtn);
-          await wait(1400);
+          await waitScaled(1400);
           // Descargar imagen de recuerdo si existe acción
           const downloadBtn = Array.from(toast.querySelectorAll("button")).find(b => /Descargar|Guardar/i.test(b.textContent));
           if (downloadBtn) {
             click(downloadBtn);
-            await wait(800);
+            await waitScaled(800);
           }
           // Cerrar toast
           const closeBtn = toast.querySelector(".close-x");
           if (closeBtn) {
             click(closeBtn);
-            await wait(400);
+            await waitScaled(400);
           }
         }
       }
@@ -698,39 +700,39 @@
       // 5) Funciones debajo de sílabas: Revelar letra
       await showMessage(DEMO_TEXT.reveal, { target: "#revealBtn" });
       click("#revealBtn");
-      await wait(1000);
+      await waitScaled(1000);
 
       // Completar todo el crucigrama rápidamente
-      clickCell(1, 8); clickSyllable("A"); await wait(250); clickSyllable("MOR");
-      clickCell(2, 8); await wait(250); clickSyllable("SE"); await wait(250); clickSyllable("ÑOR");
-      clickCell(3, 8); await wait(250); clickSyllable("BE"); await wait(250); clickSyllable("SO");
-      clickCell(4, 9); await wait(250); clickSyllable("TO"); await wait(250); clickSyllable("MA"); await wait(250); clickSyllable("DA");
-      clickCell(5, 8); await wait(250); clickSyllable("FRANC");
-      clickCell(6, 8); await wait(250); clickSyllable("ES"); await wait(200); clickSyllable("POR"); await wait(200); clickSyllable("A"); await wait(200); clickSyllable("CÁ");
-      clickCell(7, 8); await wait(250); clickSyllable("PA"); await wait(200); clickSyllable("SIÓN");
-      await wait(600);
+      clickCell(1, 8); clickSyllable("A"); await waitScaled(250); clickSyllable("MOR");
+      clickCell(2, 8); await waitScaled(250); clickSyllable("SE"); await waitScaled(250); clickSyllable("ÑOR");
+      clickCell(3, 8); await waitScaled(250); clickSyllable("BE"); await waitScaled(250); clickSyllable("SO");
+      clickCell(4, 9); await waitScaled(250); clickSyllable("TO"); await waitScaled(250); clickSyllable("MA"); await waitScaled(250); clickSyllable("DA");
+      clickCell(5, 8); await waitScaled(250); clickSyllable("FRANC");
+      clickCell(6, 8); await waitScaled(250); clickSyllable("ES"); await waitScaled(200); clickSyllable("POR"); await waitScaled(200); clickSyllable("A"); await waitScaled(200); clickSyllable("CÁ");
+      clickCell(7, 8); await waitScaled(250); clickSyllable("PA"); await waitScaled(200); clickSyllable("SIÓN");
+      await waitScaled(600);
 
       // 6) Verificar y modal final
       await showMessage(DEMO_TEXT.verify, { target: "#checkBtn" });
       click("#checkBtn");
-      await wait(1800);
+      await waitScaled(1800);
       const modal = qs("#finalModal");
       if (modal) {
         highlightElement("#shareCanvas", 1400);
-        await wait(1600);
+        await waitScaled(1600);
         // Descargar tarjeta final
         click("#downloadCard");
-        await wait(800);
+        await waitScaled(800);
         click("#closeModal");
-        await wait(800);
+        await waitScaled(800);
       }
 
       // 7) QR: mostrar y descargar
       await showMessage(DEMO_TEXT.qr, { target: "#qrBtn" });
       click("#qrBtn");
-      await wait(1200);
+      await waitScaled(1200);
       click("#downloadQr");
-      await wait(800);
+      await waitScaled(800);
       click("#closeQr");
 
       console.log("✅ Demo narrada completada.");
@@ -1006,10 +1008,10 @@
   console.log("");
   console.log("📋 COMANDOS DISPONIBLES:");
   console.log("");
+  console.log("  runNarratedDemo()      - Demo narrada (recomendada para grabar)");
   console.log("  runFullDemo()          - Demo completa (2-3 minutos)");
   console.log("  runQuickDemo()         - Demo rápida (60 segundos)");
   console.log("  runDemoStep(n)         - Ejecutar solo el paso n (1-14)");
-  console.log("  runNarratedDemo()      - Demo narrada (auto, sin confirmar)");
   console.log("  runGuidedDemo()        - Demo guiada (avanza con clic)");
   console.log("  runGuidedStep(n)       - Paso n con guía (1-14)");
   console.log("  pauseDemo()            - Pausar la demo");
@@ -1036,7 +1038,7 @@
   console.log("");
   console.log("  1. Refresca la página (F5)");
   console.log("  2. Inicia tu grabador de pantalla");
-  console.log("  3. Ejecuta: await runFullDemo()");
+  console.log("  3. Ejecuta: await runNarratedDemo()");
   console.log("");
   console.log("════════════════════════════════════════════════════════════");
   console.log("");
@@ -1052,6 +1054,7 @@
     resumeDemo,
     __ready: true,
   };
+  window.DEMO_CONFIG = DEMO_CONFIG;
   window.runFullDemo = runFullDemo;
   window.runQuickDemo = runQuickDemo;
   window.runDemoStep = runDemoStep;
