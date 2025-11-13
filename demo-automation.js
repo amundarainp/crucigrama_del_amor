@@ -29,7 +29,7 @@
   // Utilidades
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const qs = (selector) => document.querySelector(selector);
-  const DEMO_CONFIG = { speed: 1, msgDuration: 2400 };
+  const DEMO_CONFIG = { speed: 1.1, msgDuration: 3200, pointerDelay: 900 };
   const waitScaled = (ms) => wait(ms * DEMO_CONFIG.speed);
   const click = (selector) => {
     const el = typeof selector === "string" ? qs(selector) : selector;
@@ -114,14 +114,14 @@
     const y = rect.top + rect.height / 2 + offsetY;
     ensurePointer();
     pointerEl.style.transform = `translate(${x}px, ${y}px)`;
-    await waitScaled(500);
+    await waitScaled(DEMO_CONFIG.pointerDelay);
   }
   async function clickWithPointer(target) {
     const el = typeof target === "string" ? qs(target) : target;
     if (!el) return;
     await movePointerTo(el);
     el.click();
-    await waitScaled(500);
+    await waitScaled(Math.max(300, Math.round(DEMO_CONFIG.pointerDelay * 0.6)));
   }
 
   // ============================================
@@ -173,13 +173,10 @@
 
     const card = document.createElement("div");
     card.className = "demo-guide-card";
-    const title = document.createElement("h3");
-    title.textContent = "Recorrido guiado";
     const msg = document.createElement("div");
     msg.className = "demo-guide-msg";
     const actions = document.createElement("div");
     actions.className = "demo-guide-actions";
-    card.appendChild(title);
     card.appendChild(msg);
     card.appendChild(actions);
     overlay.appendChild(backdrop);
@@ -673,8 +670,11 @@
       clickSyllable("SA");
       await waitScaled(600);
 
+      // Verificar primera palabra para mostrar tarjeta y marcar pista
+      click("#checkBtn");
+      await waitScaled(1200);
       // Mostrar tarjeta personalizada (toast): ampliar y descargar
-      await waitScaled(800);
+      await waitScaled(400);
       await showMessage(DEMO_TEXT.toast_card, { target: ".toast-host" });
       const toast = qs(".toast");
       if (toast) {
@@ -754,6 +754,61 @@
     } finally {
       DEMO_CONFIG.speed = prev.speed;
       DEMO_CONFIG.msgDuration = prev.msgDuration;
+    }
+  }
+  
+  // Compatibilidad mínima para la demo guiada
+  let guideDisabled = false;
+  async function guideStep(message, options) { return showMessage(message, options); }
+
+  // Solo la primera palabra: para revisar este tramo puntual
+  async function runNarratedFirstWord() {
+    if (demoRunning) return;
+    demoRunning = true;
+    try {
+      disableStickyHeader();
+      await showMessage(DEMO_TEXT.intro_theme, { target: "#themeToggle" });
+      await movePointerTo("#themeToggle");
+      await clickWithPointer("#themeToggle");
+      await waitScaled(900);
+      await clickWithPointer("#themeToggle");
+
+      await showMessage(DEMO_TEXT.foto, { target: ".photo-section" });
+      await showMessage(DEMO_TEXT.instructivo, { target: "#intro" });
+
+      scrollTo("#crosswordGrid");
+      await waitScaled(600);
+      await showMessage(DEMO_TEXT.clue_sonrisa, { target: "#clues" });
+      const firstClue = qs("#clue-across-0");
+      if (firstClue) { highlightElement(firstClue, 1400); await waitScaled(700); }
+      clickCell(0, 8);
+      await waitScaled(500);
+      await showMessage(DEMO_TEXT.syllables, { target: "#syllGrid" });
+      clickSyllable("SON"); await waitScaled(400);
+      clickSyllable("RI"); await waitScaled(400);
+      clickSyllable("SA"); await waitScaled(600);
+
+      // Verificar para disparar tarjeta y marcar pista
+      click("#checkBtn");
+      await waitScaled(1200);
+      await showMessage(DEMO_TEXT.toast_card, { target: ".toast-host" });
+      const toast = qs(".toast");
+      if (toast) {
+        const expandBtn = toast.querySelector("button.secondary");
+        if (expandBtn && expandBtn.textContent === "Ampliar") {
+          click(expandBtn);
+          await waitScaled(1400);
+          const downloadBtn = Array.from(toast.querySelectorAll("button")).find(b => /Descargar|Guardar/i.test(b.textContent));
+          if (downloadBtn) { click(downloadBtn); await waitScaled(800); }
+          const closeBtn = toast.querySelector(".close-x");
+          if (closeBtn) { click(closeBtn); await waitScaled(400); }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      restoreStickyHeader();
+      demoRunning = false;
     }
   }
   async function runGuidedDemo() {
@@ -1023,6 +1078,7 @@
   console.log("");
   console.log("  runNarratedDemo()      - Demo narrada (recomendada para grabar)");
   console.log("  runNarratedDemo60()    - Demo narrada versión 60s");
+  console.log("  runNarratedFirstWord() - Solo primer palabra (revisión)");
   console.log("  runFullDemo()          - Demo completa (2-3 minutos)");
   console.log("  runQuickDemo()         - Demo rápida (60 segundos)");
   console.log("  runDemoStep(n)         - Ejecutar solo el paso n (1-14)");
@@ -1062,6 +1118,7 @@
     runQuickDemo,
     runDemoStep,
     runNarratedDemo,
+    runNarratedFirstWord,
     runNarratedDemo60,
     runGuidedDemo,
     runGuidedStep,
@@ -1070,6 +1127,7 @@
     __ready: true,
   };
   window.DEMO_CONFIG = DEMO_CONFIG;
+  window.DEMO_TEXT = DEMO_TEXT;
   window.runFullDemo = runFullDemo;
   window.runQuickDemo = runQuickDemo;
   window.runDemoStep = runDemoStep;
