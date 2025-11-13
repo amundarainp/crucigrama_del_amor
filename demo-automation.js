@@ -220,6 +220,45 @@
     await waitScaled(150);
   }
 
+  // Overlay bloqueante que espera flechas (← →) o ESC
+  function showOverlayBlocking(message, options = {}) {
+    const { target, offset = -120 } = options;
+    ensureGuideUI();
+
+    let el = null;
+    if (target) {
+      el = typeof target === "string" ? qs(target) : target;
+      if (el) {
+        const y = el.getBoundingClientRect().top + window.pageYOffset + offset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+        el.classList.add("demo-guide-highlight");
+      }
+    }
+
+    showOverlay(message);
+
+    return new Promise((resolve) => {
+      function onKey(e) {
+        if (e.key === "ArrowRight") {
+          cleanup();
+          resolve("next");
+        } else if (e.key === "ArrowLeft") {
+          cleanup();
+          resolve("prev");
+        } else if (e.key === "Escape") {
+          cleanup();
+          resolve("esc");
+        }
+      }
+      function cleanup() {
+        window.removeEventListener("keydown", onKey);
+        hideOverlay();
+        if (el) el.classList.remove("demo-guide-highlight");
+      }
+      window.addEventListener("keydown", onKey);
+    });
+  }
+
   // ============================================
   // CONTROL HEADER STICKY DURANTE DEMO
   // ============================================
@@ -756,6 +795,81 @@
       DEMO_CONFIG.msgDuration = prev.msgDuration;
     }
   }
+
+  // Demo con control por teclado: ← volver | → avanzar | Esc salir
+  async function runKeyboardDemo() {
+    if (demoRunning) return;
+    demoRunning = true;
+    let idx = 0;
+    let cancelled = false;
+
+    const steps = [
+      {
+        msg: DEMO_TEXT.intro_theme,
+        target: "#themeToggle",
+        action: async () => {
+          await movePointerTo("#themeToggle");
+          await clickWithPointer("#themeToggle");
+          await waitScaled(700);
+          await clickWithPointer("#themeToggle");
+        },
+      },
+      { msg: DEMO_TEXT.foto, target: ".photo-section", action: async () => {} },
+      { msg: DEMO_TEXT.instructivo, target: "#intro", action: async () => {} },
+      {
+        msg: DEMO_TEXT.clue_sonrisa,
+        target: "#clues",
+        action: async () => {
+          scrollTo("#crosswordGrid");
+          await waitScaled(400);
+          clickCell(0, 8);
+          await waitScaled(300);
+          await showMessage(DEMO_TEXT.syllables, { target: "#syllGrid" });
+          clickSyllable("SON"); await waitScaled(300);
+          clickSyllable("RI"); await waitScaled(300);
+          clickSyllable("SA"); await waitScaled(500);
+          click("#checkBtn");
+          await waitScaled(900);
+        },
+      },
+      {
+        msg: DEMO_TEXT.toast_card,
+        target: ".toast-host",
+        action: async () => {
+          const toast = qs(".toast");
+          if (toast) {
+            const expandBtn = toast.querySelector("button.secondary");
+            if (expandBtn && expandBtn.textContent === "Ampliar") {
+              click(expandBtn);
+              await waitScaled(1000);
+              const downloadBtn = Array.from(toast.querySelectorAll("button")).find(b => /Descargar|Guardar/i.test(b.textContent));
+              if (downloadBtn) { click(downloadBtn); await waitScaled(600); }
+              const closeBtn = toast.querySelector(".close-x");
+              if (closeBtn) { click(closeBtn); await waitScaled(300); }
+            }
+          }
+        },
+      },
+    ];
+
+    try {
+      disableStickyHeader();
+      while (!cancelled && idx >= 0 && idx < steps.length) {
+        const step = steps[idx];
+        const key = await showOverlayBlocking(step.msg, { target: step.target });
+        if (key === "esc") { cancelled = true; break; }
+        if (key === "prev") { idx = Math.max(0, idx - 1); continue; }
+        // next
+        await step.action();
+        idx += 1;
+      }
+    } catch (e) {
+      console.error("❌ Error en demo por teclado:", e);
+    } finally {
+      restoreStickyHeader();
+      demoRunning = false;
+    }
+  }
   
   // Compatibilidad mínima para la demo guiada
   let guideDisabled = false;
@@ -1078,6 +1192,7 @@
   console.log("");
   console.log("  runNarratedDemo()      - Demo narrada (recomendada para grabar)");
   console.log("  runNarratedDemo60()    - Demo narrada versión 60s");
+  console.log("  runKeyboardDemo()      - Demo con flechas (←/→) y Esc");
   console.log("  runNarratedFirstWord() - Solo primer palabra (revisión)");
   console.log("  runFullDemo()          - Demo completa (2-3 minutos)");
   console.log("  runQuickDemo()         - Demo rápida (60 segundos)");
@@ -1120,6 +1235,7 @@
     runNarratedDemo,
     runNarratedFirstWord,
     runNarratedDemo60,
+    runKeyboardDemo,
     runGuidedDemo,
     runGuidedStep,
     pauseDemo,

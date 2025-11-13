@@ -186,16 +186,16 @@
           startBtn.style.opacity = "0.7";
           try {
             await loadDemoScript();
-            if (window.DEMO && typeof window.DEMO.runNarratedDemo === "function") {
-              await window.DEMO.runNarratedDemo();
-            } else if (typeof window.runNarratedDemo === "function") {
-              await window.runNarratedDemo();
+            if (window.DEMO && typeof window.DEMO.runKeyboardDemo === "function") {
+              await window.DEMO.runKeyboardDemo();
+            } else if (typeof window.runKeyboardDemo === "function") {
+              await window.runKeyboardDemo();
             } else {
-              alert("La demo narrada no está disponible.");
+              alert("La demo por teclado no está disponible.");
             }
           } catch (err) {
             console.error(err);
-            alert("Error cargando la demo narrada.");
+            alert("Error cargando la demo.");
           } finally {
             startBtn.disabled = false;
             startBtn.style.opacity = "";
