@@ -44,6 +44,16 @@
         <span class="theme-icon" aria-hidden="true">🌙</span>
         <span class="theme-text">Modo oscuro</span>
       </button>
+      <button
+        id="guidedDemoBtn"
+        type="button"
+        class="theme-btn"
+        aria-label="Iniciar recorrido guiado"
+        title="Recorrido guiado"
+      >
+        <span aria-hidden="true">🎥</span>
+        <span>Recorrido</span>
+      </button>
     </div>
 
     <main class="container">
@@ -289,5 +299,44 @@
 
     <script src="vendor/qrcode.min.js" defer></script>
     <script src="index.js" defer></script>
+    <script>
+      (function () {
+        const btn = document.getElementById("guidedDemoBtn");
+        if (!btn) return;
+
+        function loadDemoScript() {
+          if (window.DEMO && window.DEMO.__ready) return Promise.resolve();
+          return new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src = "demo-automation.js";
+            s.async = true;
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error("No se pudo cargar demo-automation.js"));
+            document.head.appendChild(s);
+          });
+        }
+
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          btn.style.opacity = "0.7";
+          try {
+            await loadDemoScript();
+            if (window.DEMO && typeof window.DEMO.runGuidedDemo === "function") {
+              await window.DEMO.runGuidedDemo();
+            } else if (typeof window.runGuidedDemo === "function") {
+              await window.runGuidedDemo();
+            } else {
+              alert("La demo guiada no está disponible.");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Error cargando la demo guiada.");
+          } finally {
+            btn.disabled = false;
+            btn.style.opacity = "";
+          }
+        });
+      })();
+    </script>
   </body>
 </html>
