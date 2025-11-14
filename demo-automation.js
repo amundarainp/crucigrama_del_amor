@@ -861,20 +861,29 @@
           
           // Clicar SON
           await showMessage("Primero: SON", { target: "#syllGrid", duration: 1800 });
-          await movePointerTo(getSyllables().find(s => s.textContent.trim() === "SON"));
-          await clickWithPointer(getSyllables().find(s => s.textContent.trim() === "SON"));
+          const syllSON = getSyllables().find(s => s.textContent.trim() === "SON" && !s.classList.contains("used"));
+          if (syllSON) {
+            await movePointerTo(syllSON);
+            await clickWithPointer(syllSON);
+          }
           await waitScaled(1200);
           
           // Clicar RI
           await showMessage("Segundo: RI", { target: "#syllGrid", duration: 1800 });
-          await movePointerTo(getSyllables().find(s => s.textContent.trim() === "RI"));
-          await clickWithPointer(getSyllables().find(s => s.textContent.trim() === "RI"));
+          const syllRI = getSyllables().find(s => s.textContent.trim() === "RI" && !s.classList.contains("used"));
+          if (syllRI) {
+            await movePointerTo(syllRI);
+            await clickWithPointer(syllRI);
+          }
           await waitScaled(1200);
           
           // Clicar SA
           await showMessage("Tercero: SA", { target: "#syllGrid", duration: 1800 });
-          await movePointerTo(getSyllables().find(s => s.textContent.trim() === "SA"));
-          await clickWithPointer(getSyllables().find(s => s.textContent.trim() === "SA"));
+          const syllSA = getSyllables().find(s => s.textContent.trim() === "SA" && !s.classList.contains("used"));
+          if (syllSA) {
+            await movePointerTo(syllSA);
+            await clickWithPointer(syllSA);
+          }
           await waitScaled(1200);
           
           // Verificar
