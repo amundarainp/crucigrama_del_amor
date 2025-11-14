@@ -852,24 +852,28 @@
             await waitScaled(1200);
           }
           
-          // Enfocar la primera celda
+          // Enfocar la primera celda de SONRISA (fila 0, columna 8)
           const firstCell = qs('[data-row="0"][data-col="8"]');
           if (firstCell) {
             await movePointerTo(firstCell);
+            await waitScaled(400);
             firstCell.focus();
             firstCell.click();
           }
           await waitScaled(800);
           
           // Explicar las sílabas
-          await showMessage("Veamos las sílabas disponibles. Vamos a completar SON-RI-SA.", { target: "#syllGrid", duration: 2000 });
+          await showMessage("Veamos las sílabas disponibles. Vamos a completar SON-RI-SA.", { target: "#syllGrid", duration: 2200 });
           
-          // Clicar SON
-          await showMessage("Primero: SON", { target: "#syllGrid", duration: 1800 });
+          // Obtener todas las sílabas
           const allSylls = Array.from(document.querySelectorAll(".sy"));
+          
+          // Clicar SON (con celda enfocada, insertará las letras)
+          await showMessage("Primero: SON", { target: "#syllGrid", duration: 1800 });
           const syllSON = allSylls.find(s => s.textContent.trim() === "SON" && !s.classList.contains("used"));
           if (syllSON) {
             await movePointerTo(syllSON);
+            await waitScaled(DEMO_CONFIG.pointerDelay);
             syllSON.click();
           }
           await waitScaled(1200);
@@ -879,6 +883,7 @@
           const syllRI = allSylls.find(s => s.textContent.trim() === "RI" && !s.classList.contains("used"));
           if (syllRI) {
             await movePointerTo(syllRI);
+            await waitScaled(DEMO_CONFIG.pointerDelay);
             syllRI.click();
           }
           await waitScaled(1200);
@@ -888,6 +893,7 @@
           const syllSA = allSylls.find(s => s.textContent.trim() === "SA" && !s.classList.contains("used"));
           if (syllSA) {
             await movePointerTo(syllSA);
+            await waitScaled(DEMO_CONFIG.pointerDelay);
             syllSA.click();
           }
           await waitScaled(1200);
