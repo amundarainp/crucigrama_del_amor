@@ -853,36 +853,42 @@
           }
           
           // Enfocar la primera celda
-          clickCell(0, 8);
-          await waitScaled(600);
+          const firstCell = qs('[data-row="0"][data-col="8"]');
+          if (firstCell) {
+            await movePointerTo(firstCell);
+            firstCell.focus();
+            firstCell.click();
+          }
+          await waitScaled(800);
           
           // Explicar las sílabas
-          await showMessage("Veamos las sílabas disponibles. Vamos a completar SON-RI-SA.", { target: "#syllGrid" });
+          await showMessage("Veamos las sílabas disponibles. Vamos a completar SON-RI-SA.", { target: "#syllGrid", duration: 2000 });
           
           // Clicar SON
           await showMessage("Primero: SON", { target: "#syllGrid", duration: 1800 });
-          const syllSON = getSyllables().find(s => s.textContent.trim() === "SON" && !s.classList.contains("used"));
+          const allSylls = Array.from(document.querySelectorAll(".sy"));
+          const syllSON = allSylls.find(s => s.textContent.trim() === "SON" && !s.classList.contains("used"));
           if (syllSON) {
             await movePointerTo(syllSON);
-            await clickWithPointer(syllSON);
+            syllSON.click();
           }
           await waitScaled(1200);
           
           // Clicar RI
           await showMessage("Segundo: RI", { target: "#syllGrid", duration: 1800 });
-          const syllRI = getSyllables().find(s => s.textContent.trim() === "RI" && !s.classList.contains("used"));
+          const syllRI = allSylls.find(s => s.textContent.trim() === "RI" && !s.classList.contains("used"));
           if (syllRI) {
             await movePointerTo(syllRI);
-            await clickWithPointer(syllRI);
+            syllRI.click();
           }
           await waitScaled(1200);
           
           // Clicar SA
           await showMessage("Tercero: SA", { target: "#syllGrid", duration: 1800 });
-          const syllSA = getSyllables().find(s => s.textContent.trim() === "SA" && !s.classList.contains("used"));
+          const syllSA = allSylls.find(s => s.textContent.trim() === "SA" && !s.classList.contains("used"));
           if (syllSA) {
             await movePointerTo(syllSA);
-            await clickWithPointer(syllSA);
+            syllSA.click();
           }
           await waitScaled(1200);
           
