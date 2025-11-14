@@ -839,19 +839,49 @@
       { msg: DEMO_TEXT.foto, target: ".photo-section", action: async () => {} },
       { msg: DEMO_TEXT.instructivo, target: "#intro", action: async () => {} },
       {
-        msg: DEMO_TEXT.clue_sonrisa + " Respuesta: SONRISA. Usá SON, RI y SA, y luego tocá Verificar.",
+        msg: DEMO_TEXT.clue_sonrisa + " La respuesta es: SONRISA.",
         target: "#clues",
         action: async () => {
           scrollTo("#crosswordGrid");
           await waitScaled(400);
+          
+          // Resaltar la pista
+          const firstClue = qs("#clue-across-0");
+          if (firstClue) {
+            highlightElement(firstClue, 2000);
+            await waitScaled(1200);
+          }
+          
+          // Enfocar la primera celda
           clickCell(0, 8);
-          await waitScaled(300);
-          await showMessage(DEMO_TEXT.syllables, { target: "#syllGrid" });
-          // Esperar a que el cliente haga clic en las sílabas correctas
-          await waitForSyllablesUsed(["SON", "RI", "SA"], { timeout: 30000 });
-          // Sugerir verificar y esperar tarjeta
-          await showMessage("Tocá Verificar para ver la tarjetita de recuerdo.", { target: "#checkBtn" });
-          await waitForElement(".toast", { timeout: 30000 });
+          await waitScaled(600);
+          
+          // Explicar las sílabas
+          await showMessage("Veamos las sílabas disponibles. Vamos a completar SON-RI-SA.", { target: "#syllGrid" });
+          
+          // Clicar SON
+          await showMessage("Primero: SON", { target: "#syllGrid", duration: 1800 });
+          await movePointerTo(getSyllables().find(s => s.textContent.trim() === "SON"));
+          await clickWithPointer(getSyllables().find(s => s.textContent.trim() === "SON"));
+          await waitScaled(1200);
+          
+          // Clicar RI
+          await showMessage("Segundo: RI", { target: "#syllGrid", duration: 1800 });
+          await movePointerTo(getSyllables().find(s => s.textContent.trim() === "RI"));
+          await clickWithPointer(getSyllables().find(s => s.textContent.trim() === "RI"));
+          await waitScaled(1200);
+          
+          // Clicar SA
+          await showMessage("Tercero: SA", { target: "#syllGrid", duration: 1800 });
+          await movePointerTo(getSyllables().find(s => s.textContent.trim() === "SA"));
+          await clickWithPointer(getSyllables().find(s => s.textContent.trim() === "SA"));
+          await waitScaled(1200);
+          
+          // Verificar
+          await showMessage("¡Palabra completa! Ahora verificamos para ver la tarjetita.", { target: "#checkBtn", duration: 2200 });
+          await movePointerTo("#checkBtn");
+          await clickWithPointer("#checkBtn");
+          await waitScaled(1500);
         },
       },
       {
