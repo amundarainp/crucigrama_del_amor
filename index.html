@@ -31,39 +31,10 @@
     </header>
 
     <div class="main-spacer"></div>
-    <div
-      style="margin-top: 10px; display: flex; gap: 10px; align-items: center"
-    >
-      <button
-        id="themeToggle"
-        type="button"
-        class="theme-btn"
-        aria-pressed="false"
-        aria-label="Cambiar tema"
-      >
+    <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center">
+      <button id="themeToggle" type="button" class="theme-btn" aria-pressed="false" aria-label="Cambiar tema">
         <span class="theme-icon" aria-hidden="true">🌙</span>
         <span class="theme-text">Modo oscuro</span>
-      </button>
-      <button
-        id="guidedDemoBtn"
-        type="button"
-        class="theme-btn"
-        aria-label="Iniciar recorrido guiado"
-        title="Recorrido guiado"
-      >
-        <span aria-hidden="true">🎥</span>
-        <span>Recorrido</span>
-      </button>
-      <button
-        id="startNarratedDemoBtn"
-        type="button"
-        class="theme-btn"
-        aria-label="Iniciar demo narrada"
-        title="Iniciar demo"
-        style="display:none"
-      >
-        <span aria-hidden="true">▶</span>
-        <span>Iniciar demo</span>
       </button>
     </div>
 
@@ -310,72 +281,75 @@
 
     <script src="vendor/qrcode.min.js" defer></script>
     <script src="index.js" defer></script>
+
+    <!-- === Tour embebido === -->
+    <button class="tour-floating-trigger" onclick="startTourLove()">🎥 Iniciar Tour Demo</button>
+    <div class="tour-overlay" id="tourOverlayLove" onclick="endTourLove()"></div>
+    <div class="tour-spotlight" id="tourSpotlightLove" aria-hidden="true"></div>
+    <div class="tour-modal-love" id="tourModalLove" role="dialog" aria-modal="true"></div>
     <script>
-      (function () {
-        const btn = document.getElementById("guidedDemoBtn");
-        if (!btn) return;
+      const tourStepsLove = [
+        { id: 'header', target: '.sticky-header', icon: '🏷️', title: 'Encabezado pegajoso', description: 'Título de la experiencia y bajada romántica siempre visibles al hacer scroll.', benefit: { title: '✨ Claridad constante', text: 'El usuario nunca pierde el contexto del juego y su propósito.' }, position: 'center' },
+        { id: 'foto', target: '.photo-section', icon: '📷', title: 'Foto principal', description: 'Una imagen con marco y leyenda manuscrita que ambienta la historia.', benefit: { title: '✨ Emoción visual', text: 'Prepara el terreno afectivo antes de jugar.' }, position: 'center' },
+        { id: 'intro', target: '#intro', icon: 'ℹ️', title: 'Instructivo', description: 'Explicación breve: completá las palabras y verificá el acróstico NOSOTROS.', benefit: { title: '✨ Onboarding simple', text: 'Instrucciones claras para empezar sin fricción.' }, position: 'center' },
+        { id: 'silabas', target: '.syllables', icon: '🔡', title: 'Sílabas y acciones rápidas', description: 'Tablero de sílabas con modo compacto y acciones como verificar, borrar y revelar letra.', benefit: { title: '✨ Usabilidad', text: 'Herramientas pensadas para avanzar y aprender jugando.' }, position: 'center' },
+        { id: 'tablero', target: '.board', icon: '🧩', title: 'Grilla del crucigrama', description: 'Celdas con índices, estilos alternativos y validación visual de aciertos.', benefit: { title: '✨ Feedback inmediato', text: 'Refuerza el progreso y mejora la experiencia.' }, position: 'center' },
+        { id: 'pistas', target: '.clues', icon: '🧠', title: 'Pistas', description: 'Listado de pistas con chips y estados de correctas.', benefit: { title: '✨ Aprendizaje guiado', text: 'Descubrí la palabra con ayuda justa.' }, position: 'center' },
+        { id: 'qr', target: '#qrBtn', icon: '📱', title: 'QR para compartir', description: 'Generá un código QR para abrir el juego en otro dispositivo o compartir el link.', benefit: { title: '✨ Viralidad orgánica', text: 'Facilitamos compartir la experiencia con otros.' }, position: 'center' },
+        { id: 'footer', target: 'footer', icon: '📋', title: 'Footer con credibilidad', description: 'Firma Amor en Páginas, paquete y tiempos de entrega.', benefit: { title: '✨ Confianza y transparencia', text: 'Claridad sobre autoría y propuesta de valor.' }, position: 'center' },
+        { id: 'final', target: 'body', icon: '🌟', title: '¡Infinitas Posibilidades! ', description: 'Este es solo un ejemplo de lo que podemos crear. Cada página se adapta a tu historia, tus fotos y tu estilo. Sea cual sea la ocasión —un cumpleaños, un aniversario, una boda, una despedida de soltera, un nacimiento, una graduación, el día de la madre o del padre, San Valentín, o cualquier momento especial— transformamos tus recuerdos en una experiencia web única, emotiva y compartible.', benefit: { title: '✨ Tu historia, tu diseño', text: 'No hay límites: solo tu imaginación y nuestras ganas de hacer realidad el regalo digital perfecto. ¿Listo para empezar?' }, position: 'center' },
+      ];
 
-        function loadDemoScript() {
-          if (window.DEMO && window.DEMO.__ready) return Promise.resolve();
-          return new Promise((resolve, reject) => {
-            const s = document.createElement("script");
-            s.src = "demo-automation.js";
-            s.async = true;
-            s.onload = () => resolve();
-            s.onerror = () => reject(new Error("No se pudo cargar demo-automation.js"));
-            document.head.appendChild(s);
-          });
-        }
+      let currentStepLove = 0;
 
-        btn.addEventListener("click", async () => {
-          btn.disabled = true;
-          btn.style.opacity = "0.7";
-          try {
-            await loadDemoScript();
-            if (window.DEMO && typeof window.DEMO.runGuidedDemo === "function") {
-              await window.DEMO.runGuidedDemo();
-            } else if (typeof window.runGuidedDemo === "function") {
-              await window.runGuidedDemo();
-            } else {
-              alert("La demo guiada no está disponible.");
-            }
-          } catch (err) {
-            console.error(err);
-            alert("Error cargando la demo guiada.");
-          } finally {
-            btn.disabled = false;
-            btn.style.opacity = "";
-          }
-        });
-
-        // Botón para iniciar la demo narrada (solo si ?demo=1)
-        const startBtn = document.getElementById("startNarratedDemoBtn");
-        const params = new URLSearchParams(window.location.search);
-        const isDemo = params.has("demo");
-        if (startBtn) {
-          if (isDemo) startBtn.style.display = "inline-flex";
-          startBtn.addEventListener("click", async () => {
-            startBtn.disabled = true;
-            startBtn.style.opacity = "0.7";
-            try {
-              await loadDemoScript();
-              if (window.DEMO && typeof window.DEMO.runNarratedDemo === "function") {
-                await window.DEMO.runNarratedDemo();
-              } else if (typeof window.runNarratedDemo === "function") {
-                await window.runNarratedDemo();
-              } else {
-                alert("La demo narrada no está disponible.");
-              }
-            } catch (err) {
-              console.error(err);
-              alert("Error cargando la demo narrada.");
-            } finally {
-              startBtn.disabled = false;
-              startBtn.style.opacity = "";
-            }
-          });
-        }
-      })();
+      function startTourLove(){
+        currentStepLove = 0;
+        document.getElementById('tourOverlayLove').style.display='block';
+        document.getElementById('tourSpotlightLove').style.display='block';
+        document.getElementById('tourModalLove').style.display='block';
+        const trig = document.querySelector('.tour-floating-trigger'); if(trig) trig.style.display='none';
+        showStepLove();
+      }
+      function endTourLove(){
+        document.getElementById('tourOverlayLove').style.display='none';
+        document.getElementById('tourSpotlightLove').style.display='none';
+        document.getElementById('tourModalLove').style.display='none';
+        const trig = document.querySelector('.tour-floating-trigger'); if(trig) trig.style.display='inline-flex';
+      }
+      function showStepLove(){
+        if(currentStepLove >= tourStepsLove.length){ endTourLove(); return; }
+        const step = tourStepsLove[currentStepLove];
+        const target = document.querySelector(step.target);
+        if(target){ target.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(()=>positionSpotlightLove(target), 600); }
+        renderModalLove(step); updateProgressDotsLove();
+      }
+      function positionSpotlightLove(el){
+        const r = el.getBoundingClientRect();
+        const s = document.getElementById('tourSpotlightLove');
+        const pad=12; s.style.top = `${r.top + window.scrollY - pad}px`;
+        s.style.left = `${r.left + window.scrollX - pad}px`;
+        s.style.width = `${r.width + pad*2}px`; s.style.height = `${r.height + pad*2}px`;
+      }
+      function renderModalLove(step){
+        const m = document.getElementById('tourModalLove');
+        m.innerHTML = `
+          <div style="text-align:center;font-size:3rem;margin-bottom:.6rem;">${step.icon}</div>
+          <h2>${step.title}</h2>
+          <p>${step.description}</p>
+          ${step.benefit ? `<div class="tour-benefit-box"><h3>${step.benefit.title}</h3><p>${step.benefit.text}</p></div>` : ''}
+          <div class="d-flex gap-3 justify-content-center align-items-center" style="display:flex;gap:12px;justify-content:center;align-items:center;">
+            <button class="tour-btn-next" onclick="nextStepLove()">Siguiente</button>
+            <button class="tour-btn-skip" onclick="endTourLove()">Saltar</button>
+          </div>
+          <div class="tour-progress-dots" id="progressDotsLove"></div>`;
+        m.onmouseenter = null;
+        m.onmouseleave = null;
+      }
+      function updateProgressDotsLove(){
+        const c = document.getElementById('progressDotsLove'); if(!c) return;
+        c.innerHTML = tourStepsLove.map((_,i)=>`<span class='${i===currentStepLove?"active":""}'></span>`).join('');
+      }
+      function nextStepLove(){ currentStepLove++; showStepLove(); }
     </script>
   </body>
 </html>

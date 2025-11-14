@@ -30,6 +30,14 @@
   --script-fs: clamp(14px, 1.4vw, 20px);
   --panel-blur: 8px;
   --photo-pos: 50% 20%;
+  /* ===== Tour button variables (global) ===== */
+  --tour-btn-bg: #9d1732;
+  --tour-btn-fg: #ffffff;
+  --tour-btn-shadow: 0 8px 24px rgba(157, 23, 50, 0.35);
+  --tour-btn-shadow-hover: 0 12px 32px rgba(157, 23, 50, 0.5);
+  --tour-btn-radius: 48px;
+  --tour-btn-pad-y: 14px;
+  --tour-btn-pad-x: 22px;
 }
 :root.compact {
   --cell: clamp(18px, 2.2vw, 28px);
@@ -52,6 +60,11 @@ html[data-theme="dark"] {
   --index-text: #cbd5e1;
   --shadow: 0 8px 24px #0006;
   --shadow-strong: 0 24px 80px #0009;
+  /* ===== Tour button variables (dark) ===== */
+  --tour-btn-bg: #f43f5e; /* usa el accent en oscuro */
+  --tour-btn-fg: #ffffff;
+  --tour-btn-shadow: 0 8px 24px rgba(244, 63, 94, 0.35);
+  --tour-btn-shadow-hover: 0 12px 32px rgba(244, 63, 94, 0.5);
 }
 /* ==================== Resets ==================== */
 * {
@@ -904,6 +917,91 @@ html[data-theme="dark"] .amor-badge:hover {
     --cell: 28px;
   }
 }
+/* ===== TOUR CSS — START ========================================================= */
+/* ==================== Tour (overlay, spotlight, modal, triggers) ==================== */
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 9998;
+  display: none;
+}
+.tour-spotlight {
+  position: fixed;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
+  border-radius: 16px;
+  pointer-events: none;
+  z-index: 9999;
+  display: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tour-modal-love {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 28px;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.35);
+  padding: 2.4rem 2rem;
+  max-width: 640px;
+  width: 92vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  z-index: 10000;
+  display: none;
+  animation: tourFadeIn 0.4s ease-out;
+}
+@keyframes tourFadeIn {
+  from { opacity: 0; transform: translate(-50%, -45%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+.tour-modal-love h2 {
+  font-size: clamp(22px, 3.6vw, 32px);
+  margin: 0 0 12px;
+  color: var(--text);
+}
+.tour-modal-love p { color: var(--muted); line-height: 1.7; }
+.tour-benefit-box {
+  background: color-mix(in oklab, var(--surface) 88%, #ffffff);
+  border: 2px dashed var(--accent);
+  border-radius: 16px;
+  padding: 1rem;
+  margin: 1rem 0 1.2rem;
+}
+.tour-benefit-box h3 { font-size: 1.05rem; color: var(--accent); margin: 0 0 6px; }
+.tour-benefit-box p { margin: 0; color: var(--text); }
+.tour-btn-next, .tour-btn-skip {
+  padding: var(--tour-btn-pad-y) var(--tour-btn-pad-x);
+  border-radius: var(--tour-btn-radius);
+  font-weight: 800;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.tour-btn-next { background: var(--tour-btn-bg); color: var(--tour-btn-fg); box-shadow: var(--tour-btn-shadow); }
+.tour-btn-next:hover { transform: translateY(-2px); box-shadow: var(--tour-btn-shadow-hover); }
+.tour-btn-skip { background: transparent; color: var(--muted); }
+.tour-progress-dots { display: flex; gap: 8px; justify-content: center; margin-top: 1rem; }
+.tour-progress-dots span { width: 8px; height: 8px; border-radius: 50%; background: #e5e7eb; transition: all 0.3s ease; }
+.tour-progress-dots span.active { background: var(--accent); width: 22px; border-radius: 4px; }
+.tour-floating-trigger {
+  position: fixed; bottom: 86px; right: 16px;
+  background: var(--tour-btn-bg);
+  color: var(--tour-btn-fg);
+  border: none; border-radius: var(--tour-btn-radius); padding: var(--tour-btn-pad-y) var(--tour-btn-pad-x);
+  font-weight: 800; font-size: 0.95rem; cursor: pointer;
+  box-shadow: var(--tour-btn-shadow);
+  z-index: 9997; animation: pulseBtn 2.5s ease-in-out infinite; transition: all 0.3s ease;
+}
+@keyframes pulseBtn { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-6px);} }
+.tour-floating-trigger:hover { transform: translateY(-4px); box-shadow: var(--tour-btn-shadow-hover); }
+@media (max-width: 600px){ .tour-modal-love{ padding: 1.8rem 1.2rem; } .tour-floating-trigger{ bottom: 76px; padding: 12px 18px; font-size: .88rem; } }
+@media (prefers-reduced-motion: reduce){ .tour-spotlight,.tour-modal-love,.tour-floating-trigger{ transition:none; animation:none; } }
+/* ===== TOUR CSS — END =========================================================== */
 /* ===== Mobile refinements ===== */
 @media (max-width: 480px) {
   /* Celdas y letras más grandes para tacto */
