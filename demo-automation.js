@@ -31,6 +31,16 @@
   const qs = (selector) => document.querySelector(selector);
   const DEMO_CONFIG = { speed: 1.1, msgDuration: 3200, pointerDelay: 900 };
   const waitScaled = (ms) => wait(ms * DEMO_CONFIG.speed);
+  const waitFor = async (predicate, { timeout = 20000, interval = 120 } = {}) => {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+      try {
+        if (predicate()) return true;
+      } catch (_) {}
+      await wait(interval);
+    }
+    return false;
+  };
   const click = (selector) => {
     const el = typeof selector === "string" ? qs(selector) : selector;
     if (el) {
@@ -57,6 +67,18 @@
       return true;
     }
     return false;
+  };
+
+  const isSyllableUsed = (text) => {
+    const syllables = Array.from(document.querySelectorAll(".syll-btn"));
+    const syll = syllables.find((s) => s.textContent.trim() === text);
+    return !!(syll && syll.classList.contains("used"));
+  };
+  const waitForSyllablesUsed = async (list, opts) => {
+    return waitFor(() => list.every((t) => isSyllableUsed(t)), opts);
+  };
+  const waitForElement = async (selector, opts) => {
+    return waitFor(() => !!qs(selector), opts);
   };
 
   const scrollTo = (selector, offset = -100) => {
@@ -817,7 +839,7 @@
       { msg: DEMO_TEXT.foto, target: ".photo-section", action: async () => {} },
       { msg: DEMO_TEXT.instructivo, target: "#intro", action: async () => {} },
       {
-        msg: DEMO_TEXT.clue_sonrisa,
+        msg: DEMO_TEXT.clue_sonrisa + " Respuesta: SONRISA. Usá SON, RI y SA, y luego tocá Verificar.",
         target: "#clues",
         action: async () => {
           scrollTo("#crosswordGrid");
@@ -825,11 +847,11 @@
           clickCell(0, 8);
           await waitScaled(300);
           await showMessage(DEMO_TEXT.syllables, { target: "#syllGrid" });
-          clickSyllable("SON"); await waitScaled(300);
-          clickSyllable("RI"); await waitScaled(300);
-          clickSyllable("SA"); await waitScaled(500);
-          click("#checkBtn");
-          await waitScaled(900);
+          // Esperar a que el cliente haga clic en las sílabas correctas
+          await waitForSyllablesUsed(["SON", "RI", "SA"], { timeout: 30000 });
+          // Sugerir verificar y esperar tarjeta
+          await showMessage("Tocá Verificar para ver la tarjetita de recuerdo.", { target: "#checkBtn" });
+          await waitForElement(".toast", { timeout: 30000 });
         },
       },
       {
